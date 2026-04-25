@@ -1,49 +1,49 @@
-# Chatbot com IA e Backend em Python
+# Chatbot with AI and Python Backend
 
-API desenvolvida em FastAPI que integra com o modelo Llama 3 (Groq) para responder perguntas de forma inteligente. Inclui banco de dados SQLite para histórico de conversas.
+API developed in FastAPI that integrates with the Llama 3 model (Groq) to answer questions intelligently. Includes SQLite database for conversation history.
 
-## Tecnologias
+## Technologies
 - FastAPI - Backend
-- Groq API (Llama 3 70B) - IA
-- SQLite - Banco de dados
+- Groq API (Llama 3 70B) - AI
+- SQLite - Database
 - HTML/CSS/JS - Frontend
 
-## Como executar localmente
+## How to run locally
 
-1. Instalar dependências
+1. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Configurar a API key
-Criar um arquivo `.env` com:
+2. Configure API key
+Create a `.env` file with:
 ```
-GROQ_API_KEY=sua_api_key_aqui
+GROQ_API_KEY=your_api_key_here
 ```
 
-3. Iniciar o servidor
+3. Start the server
 ```bash
 uvicorn main:app --reload
 ```
 
-Acesse http://localhost:8000
+Access http://localhost:8000
 
-## Estrutura do projeto
+## Project structure
 ```
 chatbot/
 ├── main.py              # FastAPI backend
 ├── database.py          # SQLite
 ├── templates/
 │   └── index.html       # Frontend
-├── .env                 # API key (não versionar)
-├── requirements.txt     # Dependências
+├── .env                 # API key (do not version)
+├── requirements.txt     # Dependencies
 └── README.md
 ```
 
 ## Endpoints
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | / | Página HTML do chat |
-| POST | /chat | Enviar pergunta |
-| GET | /historico | Recuperar histórico |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | / | Chat HTML page |
+| POST | /chat | Send question |
+| GET | /historico | Retrieve history |
