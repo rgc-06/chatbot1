@@ -1,5 +1,9 @@
 # AI Chatbot with FastAPI + Groq
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/)
+
+**Live Demo:** https://chatbot1-3sio.onrender.com/
+
 A modern chat application with conversation memory managed in RAM. Messages are stored on the server side using a global dictionary, with session IDs persisted in the browser's localStorage.
 
 ## Features
