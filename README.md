@@ -1,49 +1,62 @@
-# Chatbot with AI and Python Backend
+# AI Chatbot with FastAPI + Groq
 
-API developed in FastAPI that integrates with the Llama 3 model (Groq) to answer questions intelligently. Includes SQLite database for conversation history.
+A modern chat application with conversation memory managed in RAM. Messages are stored on the server side using a global dictionary, with session IDs persisted in the browser's localStorage.
 
-## Technologies
-- FastAPI - Backend
-- Groq API (Llama 3 70B) - AI
-- SQLite - Database
-- HTML/CSS/JS - Frontend
+## Features
 
-## How to run locally
+- **Conversation Memory**: Full context retained for all messages within a session
+- **Session Persistence**: `session_id` stored in browser `localStorage` for continuity
+- **Reset Capability**: Option to clear chat history at any time
+- **Modern UI**: Dark theme with responsive Flexbox layout
 
-1. Install dependencies
+## Tech Stack
+
+- **Backend**: FastAPI (Python)
+- **AI Model**: Groq API (Llama 3.3 70B)
+- **Frontend**: HTML, CSS, Vanilla JavaScript
+- **Storage**: In-memory dictionary (no external database)
+
+## Environment Setup
+
+Create a `.env` file in the project root with:
+
+```
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+## Running Locally
+
 ```bash
 pip install -r requirements.txt
-```
-
-2. Configure API key
-Create a `.env` file with:
-```
-GROQ_API_KEY=your_api_key_here
-```
-
-3. Start the server
-```bash
 uvicorn main:app --reload
 ```
 
-Access http://localhost:8000
+Then open http://localhost:8000 in your browser.
 
-## Project structure
-```
-chatbot/
-├── main.py              # FastAPI backend
-├── database.py          # SQLite
-├── templates/
-│   └── index.html       # Frontend
-├── .env                 # API key (do not version)
-├── requirements.txt     # Dependencies
-└── README.md
-```
+## Deployment to Render (Free Tier)
 
-## Endpoints
+1. Create a new Web Service on [Render](https://render.com/)
+2. Connect your GitHub repository
+3. Set these environment variables:
+   - `GROQ_API_KEY`: Your Groq API key
+4. Set the build command: `pip install -r requirements.txt`
+5. Set the start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+6. Deploy
+
+**Note**: Memory is volatile! The conversation history resets when the Render instance restarts (which happens periodically on the free tier). This is acceptable for portfolio/demo purposes.
+
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | / | Chat HTML page |
-| POST | /chat | Send question |
-| GET | /historico | Retrieve history |
+| GET | / | Main HTML page |
+| POST | /chat | Send message (expects `{message: "text"}`) |
+| GET | /history | Retrieve conversation history for session |
+| POST | /reset | Reset conversation for current session |
+
+## Session Management
+
+- Session ID is generated using `crypto.randomUUID()` on first load
+- Stored in browser `localStorage` as `chat_session`
+- Sent to backend via `X-Session-ID` header
+- Conversations are scoped per session ID
