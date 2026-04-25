@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Backend</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        h1 { color: #333; text-align: center; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .input-group { display: flex; gap: 10px; margin: 20px 0; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        button { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .resposta { margin-top: 20px; padding: 15px; background: #e9f7ef; border-radius: 5px; border-left: 4px solid #28a745; }
+        .erro { background: #f8d7da; border-left-color: #dc3545; }
+        .loading { color: #666; font-style: italic; }
+        .historico { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
+        .historico h3 { color: #555; }
+        .item-historico { padding: 10px 0; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chatbot Backend</h1>
+        <div class="input-group">
+            <input type="text" id="pergunta" placeholder="Faça uma pergunta..." onkeypress="if(event.key === 'Enter') enviar()">
+            <button id="btn-enviar" onclick="enviar()">Enviar</button>
+        </div>
+        <div id="resposta" class="resposta" style="display:none;"></div>
+        
+        <div class="historico">
+            <h3>Últimas Interações (SQLite)</h3>
+            <div id="historico"></div>
+        </div>
+    </div>
+
+    <script>
+        async function enviar() {
+            const input = document.getElementById('pergunta');
+            const btn = document.getElementById('btn-enviar');
+            const respostaDiv = document.getElementById('resposta');
+            const historicoDiv = document.getElementById('historico');
+            
+            const pergunta = input.value.trim();
+            if (!pergunta) return;
+            
+            btn.disabled = true;
+            input.value = '';
+            respostaDiv.style.display = 'block';
+            respostaDiv.className = 'resposta loading';
+            respostaDiv.innerHTML = 'Carregando resposta...';
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pergunta: pergunta })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    respostaDiv.className = 'resposta';
+                    respostaDiv.innerHTML = `<strong>Resposta:</strong><br>${data.resposta.replace(/\n/g, '<br>')}`;
+                } else {
+                    respostaDiv.className = 'resposta erro';
+                    respostaDiv.innerHTML = `<strong>Erro:</strong> ${data.detalhes || 'Não foi possível conectar.'}`;
+                }
+            } catch (error) {
+                respostaDiv.className = 'resposta erro';
+                respostaDiv.innerHTML = `<strong>Erro:</strong> Não foi possível conectar. Tente novamente.`;
+            } finally {
+                btn.disabled = false;
+                carregarHistorico();
+            }
+        }
+        
+        async function carregarHistorico() {
+            try {
+                const response = await fetch('/historico');
+                const dados = await response.json();
+                const historicoDiv = document.getElementById('historico');
+                if (dados.historico && dados.historico.length > 0) {
+                    historicoDiv.innerHTML = dados.historico.map(item => 
+                        `<div class="item-historico"><small>${item.timestamp}</small><br><strong>${item.pergunta}: </strong>${item.resposta}</div>`
+                    ).join('');
+                } else {
+                    historicoDiv.innerHTML = '<p><small>Nenhuma interação ainda.</small></p>';
+                }
+            } catch (e) {}
+        }
+        
+        carregarHistorico();
+    </script>
+</body>
+</html>
